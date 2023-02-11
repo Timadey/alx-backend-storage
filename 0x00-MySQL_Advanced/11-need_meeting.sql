@@ -3,7 +3,7 @@
 -- and no last_meeting or more than 1 month.
 CREATE view need_meeting
 AS
-SELECT * FROM students
+SELECT name FROM students
 WHERE score < 80
 AND
 (last_meeting IS NULL
