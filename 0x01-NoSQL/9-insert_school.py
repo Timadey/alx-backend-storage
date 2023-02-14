@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Inserts a new document in a collection based on kwargs
 """
 
