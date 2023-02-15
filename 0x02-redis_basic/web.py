@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Count how many times a web page is visited
 """
