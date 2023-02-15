@@ -11,18 +11,22 @@ red = redis.Redis()
 
 
 def count(method: Callable) -> Callable:
-    """ Decortator for counting """
+    """
+    Count how many times a web page was visited
+    """
     @wraps(method)
-    def wrapper(url):  # sourcery skip: use-named-expression
-        """ Wrapper for decorator """
-        red.incr(f"count:{url}")
-        cached_html = red.get(f"cached:{url}")
-        if cached_html:
-            return cached_html.decode('utf-8')
-        html = method(url)
-        red.setex(f"cached:{url}", 10, html)
-        return html
-
+    def wrapper(url):
+        try:
+            cached = red.get(f"cached:{url}")
+            if cached:
+                red.incr(f"count:{url}")
+                return cached.decode('utf-8')
+            res = method(url)
+            red.incr(f"count:{url}")
+            red.setex(f"cached:{url}", 10, res)
+            return res
+        except TypeError:
+            pass
     return wrapper
 
 
