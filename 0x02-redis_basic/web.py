@@ -10,7 +10,7 @@ from functools import wraps
 red = redis.Redis()
 
 
-def count(method: Callable) -> Callable:
+def count_url(method: Callable) -> Callable:
     """
     Count how many times a web page was visited
     """
@@ -27,7 +27,7 @@ def count(method: Callable) -> Callable:
     return wrapper
 
 
-@count
+@count_url
 def get_page(url: str) -> str:
     """
     Obtains the HTML content of URL and returns it
