@@ -17,12 +17,11 @@ def count(method: Callable) -> Callable:
     @wraps(method)
     def wrapper(url):
         try:
+            red.incr(f"count:{url}")
             cached = red.get(f"cached:{url}")
             if cached:
-                red.incr(f"count:{url}")
                 return cached.decode('utf-8')
             res = method(url)
-            red.incr(f"count:{url}")
             red.setex(f"cached:{url}", 10, res)
             return res
         except TypeError:
