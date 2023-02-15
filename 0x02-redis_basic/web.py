@@ -16,16 +16,14 @@ def count(method: Callable) -> Callable:
     """
     @wraps(method)
     def wrapper(url):
-        try:
-            red.incr(f"count:{url}")
-            cached = red.get(f"cached:{url}")
-            if cached:
-                return cached.decode('utf-8')
-            res = method(url)
-            red.setex(f"cached:{url}", 10, res)
-            return res
-        except TypeError:
-            pass
+        cached = red.get(f"cached:{url}")
+        if cached:
+            return cached.decode('utf-8')
+        res = method(url)
+        red.incr(f"count:{url}")
+        red.set(f"cached:{url}", res)
+        red.expire(f"cached:{url}", 10)
+        return res
     return wrapper
 
 
@@ -34,7 +32,5 @@ def get_page(url: str) -> str:
     """
     Obtains the HTML content of URL and returns it
     """
-    if type(url) != str:
-        return TypeError("Url has to be a string")
     page = requests.get(url)
     return page.text
