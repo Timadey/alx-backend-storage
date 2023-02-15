@@ -14,10 +14,13 @@ def count(method: Callable) -> Callable:
     """
     @wraps(method)
     def wrapper(*args):
-        red = redis.Redis()
-        red.incr(f"count:{args[0]}")
-        red.expire(f"count:{args[0]}", 10)
-        return method(*args)
+        url = args[0]
+        response = method(*args)
+        if response.status_code == 200:
+            red = redis.Redis()
+            red.incr(f"count:{url}")
+            red.expire(f"count:{url}", 10)
+        return response.text
     return wrapper
 
 
@@ -26,5 +29,5 @@ def get_page(url: str) -> str:
     """
     Obtains the HTML content of URL and returns it
     """
-    page = requests.get(url)
-    return page.text
+    return requests.get(url)
+
