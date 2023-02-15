@@ -1,0 +1,4 @@
+// Script that lists all name starting with 'Holberton'
+db.school.find(
+  { name: { $regex: /^Holberton/}}
+)
