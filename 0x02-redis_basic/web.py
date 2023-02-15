@@ -14,11 +14,16 @@ def count(method: Callable) -> Callable:
     """
     @wraps(method)
     def wrapper(*args):
-        url = args[0]
-        red = redis.Redis()
-        red.incr(f"count:{url}")
-        red.expire(f"count:{url}", 10)
-        return method(*args)
+        try:
+            url = args[0]
+            res = method(*args)
+            if res.status_code == 200:
+                red = redis.Redis()
+                red.incr(f"count:{url}")
+                red.expire(f"count:{url}", 10)
+            return res.text
+        except TypeError:
+            pass
     return wrapper
 
 
@@ -27,5 +32,7 @@ def get_page(url: str) -> str:
     """
     Obtains the HTML content of URL and returns it
     """
+    if type(url) != str:
+        return TypeError("Url has to be a string")
     page = requests.get(url)
-    return page.text
+    return page
